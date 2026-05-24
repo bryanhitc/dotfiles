@@ -1,0 +1,22 @@
+[user]
+name = "bryanhitc"
+email = "bryanhitc@gmail.com"
+
+[ui]
+editor = "vim"
+default-command = "log"
+
+[snapshot]
+auto-update-stale = true
+
+[[--scope]]
+--when.environments = [
+  "GEMINI_CLI",
+  "INVOKER_INFO_NAME=jetski",
+  "INVOKER_INFO_NAME=agy",
+  "INVOKER_INFO_NAME=antigravity",
+]
+[--scope.ui]
+paginate = "never"
+color = "never"
+diff-formatter = ":git"

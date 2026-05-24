@@ -1,0 +1,15 @@
+# macOS option keybinds
+# keybind = alt+backspace=text:\x1b\x7f
+# keybind = alt+delete=text:\x1bd
+# keybind = cmd+left=text:\x01
+# keybind = cmd+right=text:\x05
+
+# Zellij pane management should work
+macos-option-as-alt = true
+
+# General
+font-size = 15
+theme = iTerm2 Default
+
+# Ghostty + Zellij + SSH to avoid 27 line scroll per tick?
+mouse-scroll-multiplier = discrete:0.7
