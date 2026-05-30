@@ -43,6 +43,10 @@ function log_info -a msg
     echo "  $color_cyanℹ$color_normal $msg"
 end
 
+function log_error -a msg
+    echo "  $color_red✘$color_normal Error: $msg"
+end
+
 function cleanup_dangling_symlinks -a name
     set dest_dir "$HOME/.config/$name"
     if not test -d "$dest_dir"
@@ -102,7 +106,7 @@ function install_config -a name
     set dest_dir "$HOME/.config/$name"
 
     if not test -d "$src_dir"; and not test -f "$src_dir"
-        echo "$color_red""Error: Configuration '$name' does not exist in dotfiles/.config""$color_normal"
+        log_error "Configuration '$name' does not exist in dotfiles/.config"
         return 1
     end
 
