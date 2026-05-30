@@ -54,7 +54,7 @@ install_file() {
     # If destination exists
     if [ -e "${dest}" ] || [ -L "${dest}" ]; then
         # If it's already a symlink pointing to the correct place, do nothing
-        if [ -L "${dest}" ] && [ "$(readlink -f "${dest}")" = "$(readlink -f "${src}")" ]; then
+        if [ -L "${dest}" ] && [ "$(readlink "${dest}")" = "${src}" ]; then
             return 0
         fi
 
