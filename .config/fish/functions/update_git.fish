@@ -1,14 +1,18 @@
 function update_git -d "Download, compile, and install the latest Git version to ~/.local"
+    set -l apt_cmd "sudo apt update && sudo apt install -y build-essential gettext libcurl4-gnutls-dev libexpat1-dev libghc-zlib-dev libssl-dev make"
+
     # 1. Pre-checks for compile tools and libraries
     if not type -q make; or not type -q gcc
         echo (set_color -o red)"Error: 'make' or 'gcc' is not installed."(set_color normal) >&2
-        echo "Please install build-essential: sudo apt install build-essential" >&2
+        echo "Please install build dependencies by running:" >&2
+        echo (set_color cyan)"  $apt_cmd"(set_color normal) >&2
         return 1
     end
 
     if not type -q curl-config
         echo (set_color -o red)"Error: 'curl-config' not found. Compilation will likely fail due to missing curl headers."(set_color normal) >&2
-        echo "Please install libcurl development headers: sudo apt install libcurl4-gnutls-dev" >&2
+        echo "Please install build dependencies by running:" >&2
+        echo (set_color cyan)"  $apt_cmd"(set_color normal) >&2
         return 1
     end
 
@@ -68,7 +72,8 @@ function update_git -d "Download, compile, and install the latest Git version to
     echo "Compiling Git..."
     if not make prefix=$HOME/.local -j(nproc) all
         echo (set_color -o red)"Error: Compilation failed."(set_color normal) >&2
-        echo "Make sure you have all build dependencies installed (e.g. build-essential, libcurl4-gnutls-dev, libssl-dev, libexpat1-dev, libghc-zlib-dev, gettext)." >&2
+        echo "Please make sure you have all build dependencies installed by running:" >&2
+        echo (set_color cyan)"  $apt_cmd"(set_color normal) >&2
         cd $old_pwd
         rm -rf "$tmp_dir"
         return 1
