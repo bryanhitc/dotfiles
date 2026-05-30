@@ -15,6 +15,7 @@ auto-update-stale = true
   "INVOKER_INFO_NAME=jetski",
   "INVOKER_INFO_NAME=agy",
   "INVOKER_INFO_NAME=antigravity",
+  "ANTIGRAVITY_AGENT",
 ]
 [--scope.ui]
 paginate = "never"
