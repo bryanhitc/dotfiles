@@ -1,4 +1,17 @@
 function update_git -d "Download, compile, and install the latest Git version to ~/.local"
+    # 1. Pre-checks for compile tools and libraries
+    if not type -q make; or not type -q gcc
+        echo (set_color -o red)"Error: 'make' or 'gcc' is not installed."(set_color normal) >&2
+        echo "Please install build-essential: sudo apt install build-essential" >&2
+        return 1
+    end
+
+    if not type -q curl-config
+        echo (set_color -o red)"Error: 'curl-config' not found. Compilation will likely fail due to missing curl headers."(set_color normal) >&2
+        echo "Please install libcurl development headers: sudo apt install libcurl4-gnutls-dev" >&2
+        return 1
+    end
+
     # Fetch latest stable tag from GitHub
     echo "Checking for the latest Git release..."
     set -l latest_tag (curl -s https://api.github.com/repos/git/git/tags | grep -oE '"name": "v[0-9]+\.[0-9]+\.[0-9]+"' | head -n 1 | cut -d'"' -f4)
@@ -31,19 +44,44 @@ function update_git -d "Download, compile, and install the latest Git version to
     set -l old_pwd $PWD
     cd "$tmp_dir"
 
-    # Download and compile
+    # Download
     echo "Downloading Git source..."
-    curl -sL "https://github.com/git/git/archive/refs/tags/$latest_tag.tar.gz" -o git.tar.gz
+    if not curl -sL "https://github.com/git/git/archive/refs/tags/$latest_tag.tar.gz" -o git.tar.gz
+        echo (set_color -o red)"Error: Failed to download Git source."(set_color normal) >&2
+        cd $old_pwd
+        rm -rf "$tmp_dir"
+        return 1
+    end
 
+    # Extract
     echo "Extracting..."
-    tar -zxf git.tar.gz
+    if not tar -zxf git.tar.gz
+        echo (set_color -o red)"Error: Failed to extract Git source."(set_color normal) >&2
+        cd $old_pwd
+        rm -rf "$tmp_dir"
+        return 1
+    end
+    
     cd "git-$latest_version"
 
+    # Compile
     echo "Compiling Git..."
-    make prefix=$HOME/.local -j(nproc) all
+    if not make prefix=$HOME/.local -j(nproc) all
+        echo (set_color -o red)"Error: Compilation failed."(set_color normal) >&2
+        echo "Make sure you have all build dependencies installed (e.g. build-essential, libcurl4-gnutls-dev, libssl-dev, libexpat1-dev, libghc-zlib-dev, gettext)." >&2
+        cd $old_pwd
+        rm -rf "$tmp_dir"
+        return 1
+    end
 
+    # Install
     echo "Installing Git to ~/.local..."
-    make prefix=$HOME/.local install
+    if not make prefix=$HOME/.local install
+        echo (set_color -o red)"Error: Installation failed."(set_color normal) >&2
+        cd $old_pwd
+        rm -rf "$tmp_dir"
+        return 1
+    end
 
     # Clean up
     cd $old_pwd
@@ -51,3 +89,4 @@ function update_git -d "Download, compile, and install the latest Git version to
 
     echo "Successfully updated Git to "(git --version)
 end
+
