@@ -3,14 +3,6 @@
 set DOTFILES_DIR (cd (dirname (status filename)); and pwd)
 set BACKUP_DIR "$HOME/.config-backup/"(date +'%Y-%m-%d_%H%M%S')
 
-# Color definitions
-set -g color_normal (set_color normal)
-set -g color_green (set_color green)
-set -g color_yellow (set_color yellow)
-set -g color_cyan (set_color cyan)
-set -g color_bold (set_color --bold)
-set -g color_red (set_color red)
-
 function usage
     echo "Usage: ./install.fish <config-name> | all"
     echo "Installs configurations from the dotfiles repo into ~/.config by symlinking individual files"
@@ -27,23 +19,34 @@ set TARGET $argv[1]
 
 # Log helpers
 function log_header -a title
+    set -l color_cyan (set_color cyan)
+    set -l color_bold (set_color --bold)
+    set -l color_normal (set_color normal)
     echo ""
     echo "$color_bold$color_cyan==> Installing: $title$color_normal"
 end
 
 function log_success -a msg
+    set -l color_green (set_color green)
+    set -l color_normal (set_color normal)
     echo "  $color_green✔$color_normal $msg"
 end
 
 function log_backup -a msg
+    set -l color_yellow (set_color yellow)
+    set -l color_normal (set_color normal)
     echo "  $color_yellow↺$color_normal $msg"
 end
 
 function log_info -a msg
+    set -l color_cyan (set_color cyan)
+    set -l color_normal (set_color normal)
     echo "  $color_cyanℹ$color_normal $msg"
 end
 
 function log_error -a msg
+    set -l color_red (set_color red)
+    set -l color_normal (set_color normal)
     echo "  $color_red✘$color_normal Error: $msg"
 end
 
@@ -73,7 +76,7 @@ end
 
 function install_file -a src dest
     set dest_parent (dirname "$dest")
-    
+
     # Ensure parent directory of the destination exists
     mkdir -p "$dest_parent"
 
