@@ -1,5 +1,5 @@
 function update_git -d "Download, compile, and install the latest Git version to ~/.local"
-    set -l apt_cmd "sudo apt update && sudo apt install -y build-essential gettext libcurl4-gnutls-dev libexpat1-dev libghc-zlib-dev libssl-dev make"
+    set -l apt_cmd "sudo apt update && sudo apt install -y build-essential gettext libcurl4-gnutls-dev libexpat1-dev zlib1g-dev libssl-dev make"
 
     # 1. Pre-checks for compile tools and libraries
     if not type -q make; or not type -q gcc
