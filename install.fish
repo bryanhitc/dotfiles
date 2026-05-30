@@ -3,6 +3,14 @@
 set DOTFILES_DIR (cd (dirname (status filename)); and pwd)
 set BACKUP_DIR "$HOME/.config-backup/"(date +'%Y-%m-%d_%H%M%S')
 
+# Color definitions
+set -g color_normal (set_color normal)
+set -g color_green (set_color green)
+set -g color_yellow (set_color yellow)
+set -g color_cyan (set_color cyan)
+set -g color_bold (set_color --bold)
+set -g color_red (set_color red)
+
 function usage
     echo "Usage: ./install.fish <config-name> | all"
     echo "Installs configurations from the dotfiles repo into ~/.config by symlinking individual files"
@@ -16,6 +24,24 @@ if test (count $argv) -lt 1
 end
 
 set TARGET $argv[1]
+
+# Log helpers
+function log_header -a title
+    echo ""
+    echo "$color_bold$color_cyan==> Installing: $title$color_normal"
+end
+
+function log_success -a msg
+    echo "  $color_green✔$color_normal $msg"
+end
+
+function log_backup -a msg
+    echo "  $color_yellow↺$color_normal $msg"
+end
+
+function log_info -a msg
+    echo "  $color_cyanℹ$color_normal $msg"
+end
 
 function cleanup_dangling_symlinks -a name
     set dest_dir "$HOME/.config/$name"
@@ -36,7 +62,7 @@ function cleanup_dangling_symlinks -a name
             continue
         end
 
-        echo "Removing dangling symlink '$link' -> '$target'"
+        log_info "Removing dangling symlink: $link"
         rm "$link"
     end
 end
@@ -58,13 +84,16 @@ function install_file -a src dest
         set rel_from_home (string replace "$HOME/" "" "$dest")
         set backup_dest "$BACKUP_DIR/$rel_from_home"
 
-        echo "Backing up existing file '$dest' to '$backup_dest'..."
+        log_backup "Backing up existing file: $rel_from_home"
         mkdir -p (dirname "$backup_dest")
         mv "$dest" "$backup_dest"
     end
 
     # Create the symlink
-    echo "Symlinking '$dest' -> '$src'"
+    # Display relative path for cleaner output
+    set rel_dest (string replace "$HOME/" "~/" "$dest")
+    set rel_src (string replace "$DOTFILES_DIR/" "" "$src")
+    log_success "Symlinked $rel_dest -> $rel_src"
     ln -s "$src" "$dest"
 end
 
@@ -73,9 +102,11 @@ function install_config -a name
     set dest_dir "$HOME/.config/$name"
 
     if not test -d "$src_dir"; and not test -f "$src_dir"
-        echo "Error: Configuration '$name' does not exist in dotfiles/.config"
+        echo "$color_red""Error: Configuration '$name' does not exist in dotfiles/.config""$color_normal"
         return 1
     end
+
+    log_header "$name"
 
     # If source is an individual file, install it directly
     if test -f "$src_dir"
@@ -108,3 +139,4 @@ for item in $DOTFILES_DIR/.config/*
         install_config "$name"
     end
 end
+echo ""
